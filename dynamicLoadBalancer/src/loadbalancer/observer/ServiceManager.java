@@ -2,7 +2,7 @@ package loadbalancer.observer;
 
 import java.util.List;
 
-public class ServiceManager {
+public class ServiceManager implements ObserverI{
 		private String key;
 
 		// Information pertaining to the service.
@@ -10,4 +10,7 @@ public class ServiceManager {
 		private List<String> hostnames;
 
 		// Rest of the code.
+		public void update(){
+
+		}
 	}
