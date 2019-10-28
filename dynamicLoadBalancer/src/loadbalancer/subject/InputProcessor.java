@@ -22,16 +22,16 @@ public class InputProcessor{
 			else if(commands[0].equals("CLUSTER_OP__SCALE_DOWN")){
 				cluster.CLUSTER_OP__SCALE_DOWN(commands[1]);
 			}
-			/*else if(commands[0].equals("SERVICE_OP_ADD_SERVICE")){
+			else if(commands[0].equals("SERVICE_OP__ADD_SERVICE")){
 				cluster.SERVICE_OP_ADD_SERVICE(commands[1],commands[2],commands[3]);
 			}
-			else if(commands[0].equals("SERVICE_OP_REMOVE_SERVICE")){
+			/*else if(commands[0].equals("SERVICE_OP__REMOVE_SERVICE")){
 				cluster.SERVICE_OP_REMOVE_SERVICE(commands[1],commands[2],commands[3]);
 			}
-			else if(commands[0].equals("SERVICE_OP_ADD_INSTANCE")){
+			else if(commands[0].equals("SERVICE_OP__ADD_INSTANCE")){
 				cluster.SERVICE_OP_ADD_INSTANCE(commands[1],commands[2]);
 			}
-			else if(commands[0].equals("SERVICE_OP_REMOVE_INSTANCE")){
+			else if(commands[0].equals("SERVICE_OP__REMOVE_INSTANCE")){
 				cluster.SERVICE_OP_REMOVE_INSTANCE(commands[1],commands[2]);
 			}*/
 		}
