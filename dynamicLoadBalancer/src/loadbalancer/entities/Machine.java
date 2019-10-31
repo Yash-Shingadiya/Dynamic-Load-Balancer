@@ -17,20 +17,12 @@ public class Machine{
 		this.hostedServices = new HashMap<>();
 	}
 	
-	public void setHostedServices(String serviceName, String url){
+	public void setHostedServices(String hostname,Service service){
 		
-		if(this.hostedServices.containsKey(serviceName)){
-			System.out.println("Service already exists for"+" "+this.hostname);
-		}
-		else{
-			this.hostedServices.put(serviceName,new Service(serviceName,url));
-			System.out.println("Service Added to"+" "+this.hostname);
-		}
-	}
-
-	public Service getService(String serviceName){
-		service = this.hostedServices.get(serviceName);
-		return service;
+		this.hostname = hostname;
+		this.service = service;
+		this.hostedServices.put(this.service.getServiceName(),this.service);
+		System.out.println(this.hostedServices+" "+this.hostname);
 	}
 
 	public String getHostName(){
@@ -40,5 +32,13 @@ public class Machine{
 	public Map getHostedServices(){
 		return this.hostedServices;
 	}
-	
+
+	public Service getService(String serviceName){
+
+		if(this.hostedServices.containsKey(serviceName)){
+
+			this.service = this.hostedServices.get(serviceName);
+		}
+		return this.service;
+	}
 }

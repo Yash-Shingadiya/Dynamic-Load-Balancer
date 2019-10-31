@@ -9,8 +9,13 @@ public class ServiceManager implements ObserverI{
 		private String URL;
 		private List<String> hostnames;
 
-		// Rest of the code.
-		public void update(){
+		public ServiceManager(){
+			System.out.println("yo");
+		}
+		public void updateServiceManager(){
+
+		}
+		public void updateLoadBalancer(String serviceName){
 
 		}
 	}

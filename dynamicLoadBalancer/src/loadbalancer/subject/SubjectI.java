@@ -4,5 +4,6 @@ public interface SubjectI {
 	
 	public void registerObservers();
 	public void unregisterObservers();
-	public void notifyAllObservers();
+	public void notifyLoadBalancer(String serviceName);
+	public void notifyServiceManager();
 }
