@@ -18,7 +18,6 @@ public class ServiceManager implements ObserverI{
 			
 			this.url = url;
 			this.hostnames.add(hosts);
-			System.out.println(this.url+" "+this.hostnames);
 		}
 		public List<String> getHosts(){
 			return this.hostnames;
@@ -30,7 +29,6 @@ public class ServiceManager implements ObserverI{
 		public void addHostsToService(String hosts){
 			
 			this.hostnames.add(hosts);
-			System.out.println(this.url+" "+this.hostnames);
 		}
 		public void removeHostsfromService(String hosts){
 			

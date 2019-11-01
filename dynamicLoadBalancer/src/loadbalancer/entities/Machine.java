@@ -22,7 +22,6 @@ public class Machine{
 		this.hostname = hostname;
 		this.service = service;
 		this.hostedServices.put(this.service.getServiceName(),this.service);
-		System.out.println(this.hostedServices+" "+this.hostname);
 	}
 
 	public String getHostName(){

@@ -2,27 +2,28 @@ package loadbalancer.observer;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import loadbalancer.subject.Cluster;
 import loadbalancer.observer.Trie;
 import loadbalancer.observer.ServiceManager;
 
 
 public class LoadBalancer implements ObserverI{
-		// Index to find the URL and hostname for a given service name.
-		//
-		// Trie is optional for under-graduate students.
-		// Graduate students have to use a Trie datastructure.
+		
 		private Trie ServiceURLAndHostnameFetcher;
 
 		// Cluster on which the services are hosted.
 		private Cluster cluster;
 		private Map<String, ServiceManager> serviceMapping;
 		ServiceManager servicemanager;
+		List<String> processedRequests;
 
 		public LoadBalancer(){
 
 			this.serviceMapping = new HashMap<String,ServiceManager>();
 			this.servicemanager = new ServiceManager();
+			this.processedRequests = new ArrayList<String>();
 		}
 
 		public Map getServiceMapping(){
@@ -58,7 +59,6 @@ public class LoadBalancer implements ObserverI{
 				for(int i = 0;i < hostList.length;i++){
 
 					this.servicemanager.setHosts(url,hostList[i]);
-					System.out.println(this.serviceMapping);
 				}
 			}
 		}
@@ -73,7 +73,6 @@ public class LoadBalancer implements ObserverI{
 					ServiceManager servicemanager = entry.getValue();
 					if(servicemanager.getHosts().contains(hostname)){
 						servicemanager.removeHostsfromService(hostname);
-						System.out.println("host removed"+" "+servicemanager.getHosts());
 					}
 
 				}
@@ -83,8 +82,8 @@ public class LoadBalancer implements ObserverI{
 
 				String serviceName = hostname;
 				if(this.serviceMapping.containsKey(serviceName)){
+					
 					this.serviceMapping.remove(serviceName);
-					System.out.println(serviceName+" "+"removed"+this.serviceMapping);
 				}			
 			}
 
@@ -116,13 +115,23 @@ public class LoadBalancer implements ObserverI{
 		public String[] requestService(String serviceName){
 
 			String[] result = new String[2];
+
 			if(this.serviceMapping.containsKey(serviceName)){
 				
 				this.servicemanager = this.serviceMapping.get(serviceName);
 				result[0] = this.servicemanager.getUrl();
-				result[1] = this.servicemanager.getHosts().get(0);
-				this.servicemanager.getHosts().remove(0);
-				this.servicemanager.getHosts().add(result[1]);
+				
+				if(!this.servicemanager.getHosts().isEmpty()){
+					result[1] = this.servicemanager.getHosts().get(0);
+					this.servicemanager.getHosts().remove(0);
+					this.processedRequests.add(result[1]);	
+				}
+				else{
+					result[1] = this.processedRequests.get(0);	
+					this.processedRequests.remove(0);
+					//this.servicemanager.addHostsToService(result[1]);
+				}
+				
 			}
 			return result;
 		}

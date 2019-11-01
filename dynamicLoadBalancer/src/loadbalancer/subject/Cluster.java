@@ -37,11 +37,10 @@ public class Cluster implements SubjectI{
 		public void CLUSTER_OP__SCALE_UP(String hostname){
 
 			if(machines.containsKey(hostname)){
-				System.out.println(hostname +" "+"already exists in the cluster");
+				System.out.println(hostname +" "+"Already Exist In The Cluster");
 			}
 			else{
 				this.machines.put(hostname,new Machine(hostname));
-				System.out.println(machines);
 				System.out.println("Cluster Scaled Up");
 			}
 		}
@@ -50,7 +49,6 @@ public class Cluster implements SubjectI{
 			if(machines.containsKey(hostname)){
 				
 				machines.remove(hostname);
-				System.out.println(machines);
 				System.out.println("Cluster Scaled Down");
 				this.notifyAllObservers("CLUSTER_OP__SCALE_DOWN",hostname);
 			}
@@ -59,7 +57,7 @@ public class Cluster implements SubjectI{
 				System.out.println(hostname+" "+"Does Not Exist In The Cluster");
 			}
 		}
-		public void SERVICE_OP__ADD_SERVICE(String serviceName,String url,String hosts){
+		public int SERVICE_OP__ADD_SERVICE(String serviceName,String url,String hosts){
 
 			String[] hostList = null;
 			Map hostedServices = null;
@@ -77,56 +75,84 @@ public class Cluster implements SubjectI{
 						System.out.println("Service already exists for"+" "+hostList[i]);
 					}
 					else{
-						machine.setHostedServices(hostList[i],service);
-						System.out.println("Service Added to"+" "+hostList[i]);	
+						machine.setHostedServices(hostList[i],service);	
 					}
 				}
 				else{
 					System.out.println("Service Not Added Because"+" "+hostList[i]+" "+"Does Not Exist In The Cluster");
+					return 0;
 				}
 			}			
-
+			System.out.println("Service Added");
 			this.notifyAllObservers("SERVICE_OP__ADD_SERVICE",hosts,serviceName,url);
+			return 1;
 		}
 
 		public void SERVICE_OP__REMOVE_SERVICE(String serviceName){
 
 			Map hostedServices = null;
-			
-			for (Map.Entry<String, Machine> entry : machines.entrySet()) {
-				String hostname = entry.getKey();
-				Machine machine = entry.getValue();
-				hostedServices = machine.getHostedServices();
-
-				if(hostedServices.containsKey(serviceName)){
+			if(loadbalancer.getServiceMapping().containsKey(serviceName)){
+				
+				for (Map.Entry<String, Machine> entry : machines.entrySet()) {
 					
-					hostedServices.remove(serviceName);
-					System.out.println(serviceName+" "+"removed from"+" "+hostname);
-				}
-			}
+					String hostname = entry.getKey();
+					Machine machine = entry.getValue();
+					hostedServices = machine.getHostedServices();
 
-			System.out.println("Service Removed");
-			this.notifyAllObservers("SERVICE_OP__REMOVE_SERVICE",serviceName);				
+					if(hostedServices.containsKey(serviceName)){
+						
+						hostedServices.remove(serviceName);
+					}
+				}
+
+				System.out.println("Service Removed");
+				this.notifyAllObservers("SERVICE_OP__REMOVE_SERVICE",serviceName);				
+			}
+			else{
+				System.out.println("Invalid Service");	
+			}
+				
 		}
 		public void SERVICE_OP__ADD_INSTANCE(String serviceName,String hostname){
 
 			Map hostedServices = null;
+			if(this.machines.containsKey(hostname)){
 
-			for (Map.Entry<String, Machine> entry : machines.entrySet()) {
+				if(loadbalancer.getServiceMapping().containsKey(serviceName)){
 				
-				String host = this.machine.getHostName();
-				Machine machine = entry.getValue();
-				hostedServices = machine.getHostedServices();
+					this.servicemanager = loadbalancer.getServiceManager(serviceName);
+					if(this.servicemanager.getHosts().contains(hostname)){
+						
+						System.out.println("Instance Already Exist for"+" "+hostname);
+					}
+					else{
 
-				if((hostedServices.containsKey(serviceName))){
-					this.service = machine.getService(serviceName);	
+						for (Map.Entry<String, Machine> entry : machines.entrySet()) {
+						
+							String host = this.machine.getHostName();
+							Machine machine = entry.getValue();
+							hostedServices = machine.getHostedServices();
+
+							if((hostedServices.containsKey(serviceName))){
+								this.service = machine.getService(serviceName);	
+							}
+							
+						}
+						
+						machine.setHostedServices(hostname,this.service);
+						System.out.println("Instance Added");
+						this.notifyAllObservers("SERVICE_OP__ADD_INSTANCE",serviceName,hostname);
+					}
 				}
-				
+				else{
+
+					System.out.println(serviceName+" "+"Was Not previously Added To The Cluster Using SERVICE_OP__ADD_SERVICE ");
+				}
 			}
-			
-			machine.setHostedServices(hostname,this.service);
-			System.out.println("Instance Added");
-			this.notifyAllObservers("SERVICE_OP__ADD_INSTANCE",serviceName,hostname);
+			else{
+
+				System.out.println(serviceName+" "+"Not Removed Because"+" "+hostname+" "+"Does Not Exist In The Cluster");
+			}		
 		}
 
 		public void SERVICE_OP__REMOVE_INSTANCE(String serviceName,String hostname){
@@ -138,25 +164,38 @@ public class Cluster implements SubjectI{
 
 				if((hostedServices.containsKey(serviceName))){
 					hostedServices.remove(serviceName);	
-					System.out.println("Instance Removed"+" "+"from"+" "+hostname);
+					System.out.println("Instance Removed");
 					this.notifyAllObservers("SERVICE_OP__REMOVE_INSTANCE",serviceName,hostname);
 				}
 				else{
-					System.out.println("Instance of"+" "+serviceName+" "+"does not exist for"+" "+hostname);
+					
+					System.out.println("No Instance Of"+" "+serviceName+" "+"Is Present On"+" "+hostname);
 				}
 			}
 			else{
-				System.out.println(hostname+" "+"Does Not Exist In The Cluster");
+				
+				System.out.println("Instance of"+" "+serviceName+" "+"Not Removed Because"+" "+hostname+" "+"Does Not Exist In The Cluster");
 			}
 				
 		}
 		public void REQUEST(String serviceName){
 			
-			String[] result = new String[2];
+			String[] response = new String[2];
 			this.servicemanager = loadbalancer.getServiceManager(serviceName);	
-			System.out.println(this.servicemanager.getHosts()+" "+this.servicemanager.getUrl());
-			result = loadbalancer.requestService(serviceName);
-			System.out.println(this.servicemanager.getHosts()+" "+this.servicemanager.getUrl());
-			System.out.println("Final Result:"+" "+result[0]+" "+result[1]);
+			/*System.out.println(this.servicemanager.getHosts()+" "+this.servicemanager.getUrl());*/
+			
+			if(loadbalancer.getServiceMapping().containsKey(serviceName)){
+
+				if(this.servicemanager.getHosts().isEmpty()){
+					System.out.println("Service Inactive - Service::"+serviceName);	
+				}
+				else{
+					response = loadbalancer.requestService(serviceName);
+					System.out.println("Processed Request - Service_URL::"+response[0]+" "+"Host::"+response[1]);	
+				}
+			}
+			else{
+				System.out.println("Invalid Service");	
+			}
 		}
 	}
