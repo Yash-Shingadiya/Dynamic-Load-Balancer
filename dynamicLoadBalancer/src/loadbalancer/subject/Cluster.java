@@ -17,19 +17,17 @@ public class Cluster implements SubjectI{
 			this.machines = new HashMap<>();
 			loadbalancer = new LoadBalancer();
 		}
-		public void registerObservers(){
+		public void registerObservers(){}
+		
+		public void notifyAllObservers(String operation,String hostname,String serviceName, String url){
 
+			loadbalancer.updateObservers(operation,hostname,serviceName,url);
 		}
-		public void unregisterObservers(){
+		public void notifyAllObservers(String operation,String hostname){
 
+			loadbalancer.updateObservers(operation,hostname);
 		}
-		public void notifyServiceManager(){
-			
-		}
-		public void notifyLoadBalancer(String serviceName){
-			System.out.println(serviceName);
-			loadbalancer.updateLoadBalancer(serviceName);
-		}
+
 		public void CLUSTER_OP__SCALE_UP(String hostname){
 
 			if(machines.containsKey(hostname)){
@@ -75,13 +73,13 @@ public class Cluster implements SubjectI{
 						machine.setHostedServices(hostList[i],service);
 						System.out.println("Service Added to"+" "+hostList[i]);	
 					}
-					
-					//notifyLoadBalancer(serviceName);
 				}
 				else{
 					System.out.println("Service Not Added Because"+" "+hostList[i]+" "+"Does Not Exist In The Cluster");
 				}
 			}			
+
+			this.notifyAllObservers("SERVICE_OP__ADD_SERVICE",hosts,serviceName,url);
 		}
 
 		public void SERVICE_OP__REMOVE_SERVICE(String serviceName){
@@ -100,9 +98,9 @@ public class Cluster implements SubjectI{
 				}
 			}
 
-			//notifyLoadBalancer(serviceName);
 			System.out.println("Service Removed");
-				
+			
+			this.notifyAllObservers("SERVICE_OP__REMOVE_SERVICE",serviceName);				
 		}
 		public void SERVICE_OP__ADD_INSTANCE(String serviceName,String hostname){
 

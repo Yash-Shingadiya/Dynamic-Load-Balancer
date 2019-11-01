@@ -1,21 +1,32 @@
 package loadbalancer.observer;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class ServiceManager implements ObserverI{
 		private String key;
 
 		// Information pertaining to the service.
-		private String URL;
+		private String url;
 		private List<String> hostnames;
 
 		public ServiceManager(){
-			System.out.println("yo");
+			
+			this.hostnames = new ArrayList<String>();
 		}
-		public void updateServiceManager(){
-
+		public void setHosts(String url,String hosts){
+			
+			this.url = url;
+			this.hostnames.add(hosts);
+			System.out.println(this.url+" "+this.hostnames);
 		}
-		public void updateLoadBalancer(String serviceName){
-
+		public List<String> getHosts(){
+			return this.hostnames;
 		}
+		public String getUrl(){
+			
+			return this.url;
+		}
+		public void updateObservers(String operation,String hostname,String serviceName, String url){}
+		public void updateObservers(String operation,String hostname){}
 	}

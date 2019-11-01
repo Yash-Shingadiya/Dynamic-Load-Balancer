@@ -3,7 +3,6 @@ package loadbalancer.subject;
 public interface SubjectI {
 	
 	public void registerObservers();
-	public void unregisterObservers();
-	public void notifyLoadBalancer(String serviceName);
-	public void notifyServiceManager();
+	public void notifyAllObservers(String operation,String hostname,String serviceName, String url);
+	public void notifyAllObservers(String operation,String hostname);
 }

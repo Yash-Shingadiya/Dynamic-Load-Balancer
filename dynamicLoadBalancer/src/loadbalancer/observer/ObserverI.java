@@ -1,6 +1,7 @@
 package loadbalancer.observer;
 
 public interface ObserverI {
-	public void updateLoadBalancer(String serviceName);
-	public void updateServiceManager();		
+	
+	public void updateObservers(String operation,String hostname,String serviceName, String url);
+	public void updateObservers(String operation,String hostname);
 }
