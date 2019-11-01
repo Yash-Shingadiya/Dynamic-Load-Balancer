@@ -24,14 +24,25 @@ public class LoadBalancer implements ObserverI{
 			this.serviceMapping = new HashMap<String,ServiceManager>();
 			this.servicemanager = new ServiceManager();
 		}
+
+		public Map getServiceMapping(){
+
+			return this.serviceMapping;
+		}
+
+		public ServiceManager getServiceManager(String serviceName){
+
+			if(this.serviceMapping.containsKey(serviceName)){
+
+				this.servicemanager = this.serviceMapping.get(serviceName);
+			}
+			return this.servicemanager;
+		}
 		public void updateObservers(String operation,String hosts,String serviceName, String url){
 			
-
 			String[] hostList = null;
 			hostList = hosts.split(",");
-			
 			if(operation.equals("SERVICE_OP__ADD_SERVICE")){
-				
 				
 				if(this.serviceMapping.containsKey(serviceName)){
 	
@@ -54,18 +65,65 @@ public class LoadBalancer implements ObserverI{
 
 		public void updateObservers(String operation,String hostname){
 
-			if(operation.equals("SERVICE_OP__REMOVE_SERVICE")){
+			if(operation.equals("CLUSTER_OP__SCALE_DOWN")){
+
+				for (Map.Entry<String, ServiceManager> entry : this.serviceMapping.entrySet()) {
+					
+					String serviceName = entry.getKey();
+					ServiceManager servicemanager = entry.getValue();
+					if(servicemanager.getHosts().contains(hostname)){
+						servicemanager.removeHostsfromService(hostname);
+						System.out.println("host removed"+" "+servicemanager.getHosts());
+					}
+
+				}
+			}
+
+			else if(operation.equals("SERVICE_OP__REMOVE_SERVICE")){
 
 				String serviceName = hostname;
-				for(int i = 0;i < this.serviceMapping.size(); i++){
-
-					if(this.serviceMapping.containsKey(serviceName)){
-						this.serviceMapping.remove(serviceName);
-						System.out.println(serviceName+" "+"removed"+this.serviceMapping);
-					}
-				}		
+				if(this.serviceMapping.containsKey(serviceName)){
+					this.serviceMapping.remove(serviceName);
+					System.out.println(serviceName+" "+"removed"+this.serviceMapping);
+				}			
 			}
+
+		}
+		public void updateObservers(String operation,String serviceName,String hostname){
 			
-			
+			if(operation.equals("SERVICE_OP__ADD_INSTANCE")){
+
+				if(this.serviceMapping.containsKey(serviceName)){
+					
+					this.serviceMapping.get(serviceName).addHostsToService(hostname);
+				}				
+			}	
+
+			else if(operation.equals("SERVICE_OP__REMOVE_INSTANCE")){
+
+				if(this.serviceMapping.containsKey(serviceName)){
+
+					this.servicemanager = this.serviceMapping.get(serviceName);
+					if(this.servicemanager.getHosts().contains(hostname)){
+
+						this.servicemanager.removeHostsfromService(hostname);
+					}
+					
+				}
+			}		
+		}
+
+		public String[] requestService(String serviceName){
+
+			String[] result = new String[2];
+			if(this.serviceMapping.containsKey(serviceName)){
+				
+				this.servicemanager = this.serviceMapping.get(serviceName);
+				result[0] = this.servicemanager.getUrl();
+				result[1] = this.servicemanager.getHosts().get(0);
+				this.servicemanager.getHosts().remove(0);
+				this.servicemanager.getHosts().add(result[1]);
+			}
+			return result;
 		}
 	}

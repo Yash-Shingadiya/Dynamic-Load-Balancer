@@ -34,9 +34,9 @@ public class InputProcessor{
 			else if(commands[0].equals("SERVICE_OP__REMOVE_INSTANCE")){
 				cluster.SERVICE_OP__REMOVE_INSTANCE(commands[1],commands[2]);
 			}
-			/*else if(commands[0].equals("REQUEST")){
+			else if(commands[0].equals("REQUEST")){
 				cluster.REQUEST(commands[1]);
-			}*/
+			}
 		}
 	}
 } 

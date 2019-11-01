@@ -27,6 +27,16 @@ public class ServiceManager implements ObserverI{
 			
 			return this.url;
 		}
+		public void addHostsToService(String hosts){
+			
+			this.hostnames.add(hosts);
+			System.out.println(this.url+" "+this.hostnames);
+		}
+		public void removeHostsfromService(String hosts){
+			
+			this.hostnames.remove(hosts);
+		}
 		public void updateObservers(String operation,String hostname,String serviceName, String url){}
 		public void updateObservers(String operation,String hostname){}
+		public void updateObservers(String operation,String serviceName,String hostname){}
 	}
