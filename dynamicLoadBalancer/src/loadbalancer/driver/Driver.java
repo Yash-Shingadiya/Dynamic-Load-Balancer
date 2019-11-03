@@ -3,6 +3,7 @@ package loadbalancer.driver;
 import loadbalancer.entities.Service;
 import loadbalancer.entities.Machine;
 import loadbalancer.subject.InputProcessor;
+import loadbalancer.util.Results;
 
 /**
  * @author Yash Shingadiya
@@ -31,10 +32,19 @@ public class Driver {
 		if((args[0].equals(input1)) && (args[1].equals(input2))){
 
 			InputProcessor input = new InputProcessor();
-			input.inputFileProcessing(args[0]);
-		
-			/*Service service = new Service();
-			service.serviceInfoProcessing(args[0]);*/
+			String finalResults = input.inputFileProcessing(args[0]);
+			
+			Results results = new Results();
+
+			/**
+			* For writing output to file
+			*/
+			results.writeToFile(args[1],finalResults);
+			
+			/**
+			* For writing output to screen
+			*/
+			results.writeToStdout(finalResults);
 		
 		}	
 

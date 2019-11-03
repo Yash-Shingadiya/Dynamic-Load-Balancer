@@ -8,17 +8,27 @@ import loadbalancer.subject.Cluster;
 import loadbalancer.observer.Trie;
 import loadbalancer.observer.ServiceManager;
 
-
+/**
+ * Load balancer processes the requests and gives back a response to the Cluster
+ */
 public class LoadBalancer implements ObserverI{
 		
 		private Trie ServiceURLAndHostnameFetcher;
 
-		// Cluster on which the services are hosted.
+		/**
+		* Cluster on which the services are hosted.
+		*/
 		private Cluster cluster;
+		/**
+		 * Map for storing the mapping between service name and the service manager
+		 */
 		private Map<String, ServiceManager> serviceMapping;
 		ServiceManager servicemanager;
 		List<String> processedRequests;
 
+		/**
+		 * Constructor for initialization
+		 */
 		public LoadBalancer(){
 
 			this.serviceMapping = new HashMap<String,ServiceManager>();
@@ -26,6 +36,9 @@ public class LoadBalancer implements ObserverI{
 			this.processedRequests = new ArrayList<String>();
 		}
 
+		/**
+		 *Getter
+		 */
 		public Map getServiceMapping(){
 
 			return this.serviceMapping;
@@ -39,6 +52,10 @@ public class LoadBalancer implements ObserverI{
 			}
 			return this.servicemanager;
 		}
+		
+		/**
+		 * Depending on the type of operations observers update their state and they update the mapping of service name and service manager
+		 */
 		public void updateObservers(String operation,String hosts,String serviceName, String url){
 			
 			String[] hostList = null;
@@ -112,6 +129,9 @@ public class LoadBalancer implements ObserverI{
 			}		
 		}
 
+		/**
+		 * Main algorithm for processing the requests in a round robin fashion
+		 */
 		public String[] requestService(String serviceName){
 
 			String[] result = new String[2];
@@ -129,7 +149,6 @@ public class LoadBalancer implements ObserverI{
 				else{
 					result[1] = this.processedRequests.get(0);	
 					this.processedRequests.remove(0);
-					//this.servicemanager.addHostsToService(result[1]);
 				}
 				
 			}

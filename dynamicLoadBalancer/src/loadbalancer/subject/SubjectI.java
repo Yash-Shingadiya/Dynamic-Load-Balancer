@@ -1,5 +1,8 @@
 package loadbalancer.subject;
 
+/**
+ * Basic methods of Observer pattern which must be implemented by the Subject(Cluster)
+ */
 public interface SubjectI {
 	
 	public void registerObservers();
