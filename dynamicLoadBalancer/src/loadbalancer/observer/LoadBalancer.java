@@ -144,7 +144,9 @@ public class LoadBalancer implements ObserverI{
 				if(!this.servicemanager.getHosts().isEmpty()){
 					result[1] = this.servicemanager.getHosts().get(0);
 					this.servicemanager.getHosts().remove(0);
-					this.processedRequests.add(result[1]);	
+					
+					this.processedRequests.add(result[1]);
+
 				}
 				else{
 					result[1] = this.processedRequests.get(0);	
